@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Monthly Report – SalonFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{layout :: ownerNav}" th:with="activePage='monthly'"></div>
+
+<div class="main">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Monthly Report</div>
+            <div class="page-subtitle" th:text="${#temporals.format(yearMonth.atDay(1), 'MMMM yyyy')}">Month Year</div>
+        </div>
+        <form style="display:flex; gap:10px; align-items:center;">
+            <select name="month" class="form-control" style="width:auto;">
+                <option th:each="m : ${#numbers.sequence(1,12)}"
+                        th:value="${m}"
+                        th:selected="${m == yearMonth.monthValue}"
+                        th:text="${#temporals.format(#temporals.create(2000,m,1), 'MMMM')}">Month</option>
+            </select>
+            <select name="year" class="form-control" style="width:auto;">
+                <option th:each="y : ${#numbers.sequence(2024, 2026)}"
+                        th:value="${y}"
+                        th:selected="${y == yearMonth.year}"
+                        th:text="${y}">Year</option>
+            </select>
+            <button type="submit" class="btn btn-primary">View</button>
+        </form>
+    </div>
+
+    <div class="page-content">
+        <div class="stats-grid" style="margin-bottom:24px;">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Monthly Revenue</div>
+                <div class="stat-value" th:text="'$' + ${totalRevenue}">$0</div>
+            </div>
+        </div>
+
+        <!-- Daily breakdown table -->
+        <div class="card">
+            <div class="card-header">📅 Daily Breakdown</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Day</th><th>Revenue</th><th>Bar</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="entry : ${dailyData}">
+                            <td th:text="${#temporals.format(entry.key, 'MMM d')}">Jan 1</td>
+                            <td class="text-muted" th:text="${#temporals.format(entry.key, 'EEEE')}">Monday</td>
+                            <td class="fw-bold" th:classappend="${entry.value.compareTo(0) > 0 ? 'text-primary' : 'text-muted'}"
+                                th:text="'$' + ${entry.value}">$0</td>
+                            <td style="width:200px;">
+                                <div style="background:var(--border); border-radius:4px; height:10px; overflow:hidden;">
+                                    <div th:if="${totalRevenue.compareTo(0) > 0}"
+                                         style="background:var(--primary); height:100%; border-radius:4px; transition:width .3s;"
+                                         th:style="'width:' + (${entry.value.doubleValue() / totalRevenue.doubleValue() * 100}) + '%'"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

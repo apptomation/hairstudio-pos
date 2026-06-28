@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle != null ? pageTitle + ' – SalonFlow' : 'SalonFlow'}">SalonFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<!-- Owner Sidebar Navigation -->
+<div th:fragment="ownerNav" class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">✂️</div>
+        <span>SalonFlow</span>
+    </div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/owner/dashboard}" class="nav-item" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
+            <span class="nav-icon">📊</span> Dashboard
+        </a>
+        <a th:href="@{/owner/employees}" class="nav-item" th:classappend="${activePage == 'employees' ? 'active' : ''}">
+            <span class="nav-icon">👥</span> Employees
+        </a>
+        <a th:href="@{/owner/services}" class="nav-item" th:classappend="${activePage == 'services' ? 'active' : ''}">
+            <span class="nav-icon">💅</span> Services
+        </a>
+        <a th:href="@{/owner/reports/daily}" class="nav-item" th:classappend="${activePage == 'daily' ? 'active' : ''}">
+            <span class="nav-icon">📋</span> Daily Report
+        </a>
+        <a th:href="@{/owner/reports/monthly}" class="nav-item" th:classappend="${activePage == 'monthly' ? 'active' : ''}">
+            <span class="nav-icon">📅</span> Monthly Report
+        </a>
+        <a th:href="@{/owner/transactions}" class="nav-item" th:classappend="${activePage == 'transactions' ? 'active' : ''}">
+            <span class="nav-icon">💳</span> Transactions
+        </a>
+        <a th:href="@{/owner/settings}" class="nav-item" th:classappend="${activePage == 'settings' ? 'active' : ''}">
+            <span class="nav-icon">⚙️</span> Settings
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+       
+        <form th:action="@{/logout}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="nav-item logout-btn">
+                <span class="nav-icon">🚪</span> Logout
+            </button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

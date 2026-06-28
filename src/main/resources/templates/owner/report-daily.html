@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Daily Report – SalonFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{layout :: ownerNav}" th:with="activePage='daily'"></div>
+
+<div class="main">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Daily Report</div>
+            <div class="page-subtitle" th:text="'Date: ' + ${#temporals.format(reportDate, 'EEEE, MMMM d yyyy')}">Date</div>
+        </div>
+        <form style="display:flex; align-items:center; gap:10px;">
+            <input type="date" name="date" class="form-control"
+                   th:value="${#temporals.format(reportDate, 'yyyy-MM-dd')}"
+                   style="width:auto;"/>
+            <button type="submit" class="btn btn-primary">View</button>
+        </form>
+    </div>
+
+    <div class="page-content">
+        <!-- Summary Stats -->
+        <div class="stats-grid" style="margin-bottom:24px;">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value" th:text="'$' + ${totalRevenue}">$0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👤</div>
+                <div class="stat-label">Customers Served</div>
+                <div class="stat-value" th:text="${totalCustomers}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🧾</div>
+                <div class="stat-label">Avg. per Customer</div>
+                <div class="stat-value" th:text="${totalCustomers > 0 ? '$' + #numbers.formatDecimal(totalRevenue / totalCustomers, 1, 2) : '$0'}">$0</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Employee Performance -->
+            <div class="card">
+                <div class="card-header">👥 Employee Performance</div>
+                <div class="card-body">
+                    <div th:if="${employeeRevenue.empty}" style="color:var(--text-muted); text-align:center;">No data.</div>
+                    <div th:each="entry : ${employeeRevenue}"
+                         style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:36px; height:36px; border-radius:50%; background:var(--primary-lt); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem;">
+                                <span th:text="${entry.key.substring(0,1)}">J</span>
+                            </div>
+                            <span class="fw-bold" th:text="${entry.key}">Employee</span>
+                        </div>
+                        <span class="fw-bold text-primary" th:text="'$' + ${entry.value}">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Services -->
+            <div class="card">
+                <div class="card-header">🏆 Top Services</div>
+                <div class="card-body">
+                    <div th:if="${topServices.empty}" style="color:var(--text-muted); text-align:center;">No data.</div>
+                    <div th:each="item, stat : ${topServices}"
+                         style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="background:var(--accent); color:#fff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700;" th:text="${stat.index + 1}">1</span>
+                            <span th:text="${item[0]}">Service</span>
+                        </div>
+                        <span class="badge badge-primary" th:text="${item[1]} + ' sales'">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions List -->
+        <div class="card mt-3">
+            <div class="card-header">🧾 All Transactions</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Time</th>
+                            <th>Employee</th>
+                            <th>Services</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${transactions.empty}">
+                            <td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">No transactions on this date.</td>
+                        </tr>
+                        <tr th:each="tx, stat : ${transactions}">
+                            <td class="text-muted" th:text="${stat.index + 1}">1</td>
+                            <td th:text="${#temporals.format(tx.createdAt, 'HH:mm')}">12:00</td>
+                            <td th:text="${tx.employee.name}">Name</td>
+                            <td>
+                                <span th:each="item, iStat : ${tx.items}">
+                                    <span th:text="${item.serviceName}">Service</span><span th:if="${!iStat.last}">, </span>
+                                </span>
+                            </td>
+                            <td class="fw-bold text-primary" th:text="'$' + ${tx.totalAmount}">$0</td>
+                            <td>
+                                <span class="badge badge-success" th:text="${tx.status}">COMPLETED</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
