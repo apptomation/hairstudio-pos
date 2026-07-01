@@ -86,7 +86,7 @@
                                           th:text="${salon.active ? 'Active' : 'Disabled'}">Active</span>
               </td>
               <td>
-                <code style="font-size:.78rem;" th:text="'/pos?salon=' + ${salon.salonCode}">link</code>
+                <code style="font-size:.78rem;" th:text="${posBaseUrl + '/pos?salon=' + salon.salonCode}">link</code>
               </td>
               <td style="display:flex; gap:6px;">
                 <a th:href="@{/admin/salon/{id}(id=${salon.id})}" class="btn btn-sm btn-outline">View</a>

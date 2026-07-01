@@ -60,8 +60,7 @@
                             <td style="width:200px;">
                                 <div style="background:var(--border); border-radius:4px; height:10px; overflow:hidden;">
                                     <div th:if="${totalRevenue.compareTo(0) > 0}"
-                                         style="background:var(--primary); height:100%; border-radius:4px; transition:width .3s;"
-                                         th:style="'width:' + (${entry.value.doubleValue() / totalRevenue.doubleValue() * 100}) + '%'"></div>
+                                         th:style="'background:var(--primary); height:100%; border-radius:4px; transition:width .3s; width:' + (${entry.value.doubleValue() / totalRevenue.doubleValue() * 100}) + '%'"></div>
                                 </div>
                             </td>
                         </tr>

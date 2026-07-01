@@ -135,4 +135,25 @@ public class EmployeePOSController {
     public String legacySalonPage() {
         return "employee/salon-select";
     }
+
+    @PostMapping("/salon")
+    public String legacySalonSubmit(@RequestParam String salonCode,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes,Model model) {
+        if (salonCode == null || salonCode.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Please enter a salon code.");
+            return "redirect:/pos/salon";
+        } else {
+            Optional<Salon> found = salonService.findBySalonCode(salonCode.toUpperCase().trim());
+            if (found.isEmpty()) {
+                model.addAttribute("error", "Salon code '" + salonCode + "' not found.");
+                return "employee/salon-error";
+            }
+
+            // Valid salon — store in session and go to PIN page
+            session.setAttribute("posSalon", found.get());
+            return "redirect:/pos/pin";
+            //return "redirect:/pos?salon=" + salonCode.trim().toUpperCase();
+        }
+    }
 }

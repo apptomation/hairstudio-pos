@@ -38,7 +38,7 @@
               <tr><td class="text-muted" style="padding:6px 0;">City</td><td th:text="${salon.city}"></td></tr>
               <tr><td class="text-muted" style="padding:6px 0;">Address</td><td th:text="${salon.address}"></td></tr>
               <tr><td class="text-muted" style="padding:6px 0;">POS URL</td>
-                <td><code th:text="'http://localhost:8080/pos?salon=' + ${salon.salonCode}"></code></td></tr>
+                <td><code th:text="${posBaseUrl + '/pos?salon=' + salon.salonCode}"></code></td></tr>
             </table>
           </div>
         </div>
