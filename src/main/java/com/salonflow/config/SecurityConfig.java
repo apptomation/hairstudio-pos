@@ -55,6 +55,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         // Pre-encode admin password once at startup
+        String testencodedAdminPassword = passwordEncoder().encode("Canada@2026");
         String encodedAdminPassword = passwordEncoder().encode("admin123");
 
         return username -> {

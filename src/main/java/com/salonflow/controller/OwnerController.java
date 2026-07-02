@@ -60,6 +60,14 @@ public class OwnerController {
                                Authentication auth,
                                RedirectAttributes redirectAttributes) {
         Salon salon = getCurrentSalon(auth);
+        //to check if the pin is already used by another employee in the same salon
+        Optional<Employee> existingEmployee = employeeService.getEmployeesBySalon(salon).stream()
+                .filter(e -> e.getPin().equals(employee.getPin()))
+                .findFirst();
+        if (existingEmployee.isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "PIN already in use by another employee.");
+            return "redirect:/owner/employees";
+        }
         employee.setSalon(salon);
         employee.setRole(Employee.Role.EMPLOYEE);
         employeeService.save(employee);
@@ -79,7 +87,16 @@ public class OwnerController {
     public String editEmployee(@PathVariable Long id,
                                 @RequestParam String name,
                                 @RequestParam String pin,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes, Authentication auth) {
+        Salon salon = getCurrentSalon(auth);
+        //to check if the pin is already used by another employee in the same salon
+        Optional<Employee> existingEmployee = employeeService.getEmployeesBySalon(salon).stream()
+                .filter(e -> e.getPin().equals(pin))
+                .findFirst();
+        if (existingEmployee.isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "PIN already in use by another employee.");
+            return "redirect:/owner/employees";
+        }
         employeeService.findById(id).ifPresent(e -> {
             e.setName(name);
             e.setPin(pin);
