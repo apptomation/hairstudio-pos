@@ -28,7 +28,8 @@ public class ServiceManagementService {
     }
 
     public List<ServiceCategory> getCategories(Salon salon) {
-        return categoryRepository.findBySalonOrderByNameAsc(salon);
+        //return categoryRepository.findBySalonOrderByNameAsc(salon);
+        return categoryRepository.findBySalonOrderByIdAsc(salon);
     }
 
     @Transactional

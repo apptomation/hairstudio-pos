@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ServiceCategoryRepository extends JpaRepository<ServiceCategory, Long> {
     List<ServiceCategory> findBySalonOrderByNameAsc(Salon salon);
+    List<ServiceCategory> findBySalonOrderByIdAsc(Salon salon);
 }

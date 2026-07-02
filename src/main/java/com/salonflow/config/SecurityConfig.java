@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -64,8 +65,12 @@ public class SecurityConfig {
                         .roles("ADMIN")
                         .build();
             }
+            //i want to check if its active or not and if its active then only allow to login
             Salon salon = salonRepository.findByEmail(username)
                     .orElseThrow(() -> new UsernameNotFoundException("Not found: " + username));
+            if (!salon.isActive()) {
+                throw new DisabledException("Salon account is inactive");
+            }
             return User.builder()
                     .username(salon.getEmail())
                     .password(salon.getPassword())
