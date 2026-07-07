@@ -27,6 +27,7 @@
                             <th>Services</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,7 +44,21 @@
                                 </span>
                             </td>
                             <td class="fw-bold text-primary" th:text="'$' + ${tx.totalAmount}">$0</td>
-                            <td><span class="badge badge-success" th:text="${tx.status}">COMPLETED</span></td>
+                            <td>
+                                <span th:if="${tx.status.name() == 'COMPLETED'}" class="badge badge-success">COMPLETED</span>
+                                <span th:if="${tx.status.name() == 'CANCELLED'}" class="badge badge-danger">CANCELLED</span>
+                                <span th:if="${tx.status.name() == 'REFUNDED'}" class="badge badge-warning">REFUNDED</span>
+                            </td>
+                            <td>
+                                <form th:if="${tx.status.name() == 'COMPLETED'}"
+                                      th:action="@{/owner/transactions/{id}/cancel(id=${tx.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('Cancel transaction #' + /*[[${tx.id}]]*/ '?');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                                </form>
+                                <span th:if="${tx.status.name() != 'COMPLETED'}" style="color:var(--text-muted); font-size:.8rem;">—</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

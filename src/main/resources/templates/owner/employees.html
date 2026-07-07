@@ -65,10 +65,14 @@
                                 </button>
                                 <form th:action="@{/owner/employees/{id}/deactivate(id=${emp.id})}" method="post" style="display:inline;">
                                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                    <button type="submit" class="btn btn-sm btn-danger"
+                                    <button type="submit" class="btn btn-sm btn-danger" name="action" value="deactivate"
                                             th:if="${emp.active}"
                                             onclick="return confirm('Deactivate this employee?')">
                                         Deactivate
+                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-danger" name="action" value="delete"
+                                            onclick="return confirm('Delete this employee?')">
+                                        Delete
                                     </button>
                                 </form>
                             </td>

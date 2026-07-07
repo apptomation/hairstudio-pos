@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -36,7 +37,7 @@ public class TransactionService {
                 .totalAmount(total)
                 .paymentMethod(Transaction.PaymentMethod.CASH)
                 .status(Transaction.Status.COMPLETED)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("America/New_York")))
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
@@ -55,10 +56,17 @@ public class TransactionService {
         return transactionRepository.save(saved);
     }
 
+    @Transactional
+    public void cancelTransaction(Long id) {
+        transactionRepository.findById(id).ifPresent(tx -> {
+            tx.setStatus(Transaction.Status.CANCELLED);
+            transactionRepository.save(tx);
+        });
+    }
     public List<Transaction> getTransactionsByDate(Salon salon, LocalDate date) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(23, 59, 59);
-        return transactionRepository.findBySalonAndCreatedAtBetweenOrderByCreatedAtDesc(salon, start, end);
+        return transactionRepository.findBySalonAndStatusNotAndCreatedAtBetweenOrderByCreatedAtDesc(salon,Transaction.Status.CANCELLED, start, end);
     }
 
     public List<Transaction> getAllTransactions(Salon salon) {
@@ -101,5 +109,32 @@ public class TransactionService {
     public List<Object[]> getTopServices(Salon salon, LocalDate date) {
         return transactionRepository.findTopServicesByDateRange(
                 salon, date.atStartOfDay(), date.atTime(23, 59, 59));
+    }
+
+    // --- Date range report data ---
+
+    public BigDecimal getRevenueByRange(Salon salon, LocalDate from, LocalDate to) {
+        return transactionRepository.sumRevenueByDateRange(
+                salon, from.atStartOfDay(), to.atTime(23, 59, 59));
+    }
+
+    public long getCustomerCountByRange(Salon salon, LocalDate from, LocalDate to) {
+        return transactionRepository.countByDateRange(
+                salon, from.atStartOfDay(), to.atTime(23, 59, 59));
+    }
+
+    public List<Object[]> getEmployeePerformanceByRange(Salon salon, LocalDate from, LocalDate to) {
+        return transactionRepository.findEmployeePerformanceByDateRange(
+                salon, from.atStartOfDay(), to.atTime(23, 59, 59));
+    }
+
+    public List<Object[]> getTopServicesByRange(Salon salon, LocalDate from, LocalDate to) {
+        return transactionRepository.findTopServicesByDateRange(
+                salon, from.atStartOfDay(), to.atTime(23, 59, 59));
+    }
+
+    public List<Transaction> getTransactionsByRange(Salon salon, LocalDate from, LocalDate to) {
+        return transactionRepository.findBySalonAndStatusNotAndCreatedAtBetweenOrderByCreatedAtDesc(
+                salon, Transaction.Status.CANCELLED, from.atStartOfDay(), to.atTime(23, 59, 59));
     }
 }

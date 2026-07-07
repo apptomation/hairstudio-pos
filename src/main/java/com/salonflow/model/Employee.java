@@ -30,6 +30,9 @@ public class Employee {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "salon_id", nullable = false)
     private Salon salon;
@@ -39,5 +42,8 @@ public class Employee {
 
     public enum Role {
         OWNER, EMPLOYEE
+    }
+    public enum Status {
+        ACTIVE, INACTIVE, DELETED, RETIRED
     }
 }

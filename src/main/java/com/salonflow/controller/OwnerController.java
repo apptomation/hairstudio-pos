@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Controller
@@ -76,10 +78,19 @@ public class OwnerController {
     }
 
     @PostMapping("/employees/{id}/deactivate")
-    public String deactivateEmployee(@PathVariable Long id,
-                                      RedirectAttributes redirectAttributes) {
-        employeeService.deactivate(id);
-        redirectAttributes.addFlashAttribute("success", "Employee deactivated.");
+    public String deactivateEmployee(@PathVariable Long id,@RequestParam(value = "action") String action,
+                                     RedirectAttributes redirectAttributes) {
+        if (action.equals("deactivate")) {
+            employeeService.deactivate(id);
+            redirectAttributes.addFlashAttribute("success", "Employee deactivated.");
+        } else if (action.equals("delete")) {
+            employeeService.findById(id).ifPresent(e -> {
+               e.setActive(false);
+                e.setStatus(Employee.Status.DELETED);
+                employeeService.save(e);
+            });
+            redirectAttributes.addFlashAttribute("success", "Employee deleted.");
+        }
         return "redirect:/owner/employees";
     }
 
@@ -92,6 +103,7 @@ public class OwnerController {
         //to check if the pin is already used by another employee in the same salon
         Optional<Employee> existingEmployee = employeeService.getEmployeesBySalon(salon).stream()
                 .filter(e -> e.getPin().equals(pin))
+                .filter(e -> !e.getId().equals(id)) // Exclude the employee being edited
                 .findFirst();
         if (existingEmployee.isPresent()) {
             redirectAttributes.addFlashAttribute("error", "PIN already in use by another employee.");
@@ -100,6 +112,7 @@ public class OwnerController {
         employeeService.findById(id).ifPresent(e -> {
             e.setName(name);
             e.setPin(pin);
+            e.setActive(true);
             employeeService.save(e);
         });
         redirectAttributes.addFlashAttribute("success", "Employee updated.");
@@ -221,6 +234,32 @@ public class OwnerController {
         return "owner/transactions";
     }
 
+    @GetMapping("/reports/range")
+    public String rangeReport(@RequestParam(required = false) String from,
+                              @RequestParam(required = false) String to,
+                              Authentication auth, Model model) {
+        Salon salon = getCurrentSalon(auth);
+
+        LocalDate toDate = (to != null && !to.isEmpty()) ? LocalDate.parse(to) : LocalDate.now();
+        LocalDate fromDate = (from != null && !from.isEmpty())
+                ? LocalDate.parse(from)
+                : toDate.with(DayOfWeek.MONDAY);
+
+        long totalCustomers = transactionService.getCustomerCountByRange(salon, fromDate, toDate);
+        BigDecimal totalRevenue = transactionService.getRevenueByRange(salon, fromDate, toDate);
+
+        model.addAttribute("salon", salon);
+        model.addAttribute("fromDate", fromDate);
+        model.addAttribute("toDate", toDate);
+        model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("totalCustomers", totalCustomers);
+        model.addAttribute("dayCount", ChronoUnit.DAYS.between(fromDate, toDate) + 1);
+        model.addAttribute("employeePerformance", transactionService.getEmployeePerformanceByRange(salon, fromDate, toDate));
+        model.addAttribute("topServices", transactionService.getTopServicesByRange(salon, fromDate, toDate));
+        model.addAttribute("transactions", transactionService.getTransactionsByRange(salon, fromDate, toDate));
+        return "owner/report-range";
+    }
+
     @GetMapping("/settings")
     public String settings(Authentication auth, Model model) {
         Salon salon = getCurrentSalon(auth);
@@ -240,5 +279,19 @@ public class OwnerController {
         salonRepository.save(salon);
         redirectAttributes.addFlashAttribute("success", "Settings updated.");
         return "redirect:/owner/settings";
+    }
+
+    @PostMapping("/transactions/{id}/cancel")
+    public String cancelTransaction(@PathVariable Long id, Authentication auth,
+                                    RedirectAttributes redirectAttributes) {
+        Salon salon = getCurrentSalon(auth);
+        transactionService.findById(id).ifPresent(tx -> {
+            if (tx.getSalon().getId().equals(salon.getId())
+                    && tx.getStatus() == Transaction.Status.COMPLETED) {
+                transactionService.cancelTransaction(id);
+            }
+        });
+        redirectAttributes.addFlashAttribute("success", "Transaction cancelled.");
+        return "redirect:/owner/transactions";
     }
 }

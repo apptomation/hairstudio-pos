@@ -33,6 +33,9 @@
         <a th:href="@{/owner/reports/monthly}" class="nav-item" th:classappend="${activePage == 'monthly' ? 'active' : ''}">
             <span class="nav-icon">📅</span> Monthly Report
         </a>
+        <a th:href="@{/owner/reports/range}" class="nav-item" th:classappend="${activePage == 'range' ? 'active' : ''}">
+            <span class="nav-icon">📆</span> Employee Report
+        </a>
         <a th:href="@{/owner/transactions}" class="nav-item" th:classappend="${activePage == 'transactions' ? 'active' : ''}">
             <span class="nav-icon">💳</span> Transactions
         </a>

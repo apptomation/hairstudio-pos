@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Employee Report – SalonFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{layout :: ownerNav}" th:with="activePage='range'"></div>
+
+<div class="main">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Employee Report</div>
+            <div class="page-subtitle"
+                 th:text="${#temporals.format(fromDate, 'MMM d yyyy')} + ' – ' + ${#temporals.format(toDate, 'MMM d yyyy')}">
+                Date Range
+            </div>
+        </div>
+        <!-- Date range form -->
+        <form id="rangeForm" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <input type="date" name="from" id="fromInput" class="form-control"
+                   th:value="${#temporals.format(fromDate, 'yyyy-MM-dd')}" style="width:auto;"/>
+            <span style="color:var(--text-muted);">to</span>
+            <input type="date" name="to" id="toInput" class="form-control"
+                   th:value="${#temporals.format(toDate, 'yyyy-MM-dd')}" style="width:auto;"/>
+            <button type="submit" class="btn btn-primary">View</button>
+        </form>
+    </div>
+
+    <!-- Quick preset buttons -->
+    <div class="page-content">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;">
+            <button class="btn btn-sm btn-outline" onclick="setRange('this-week')">This Week</button>
+            <button class="btn btn-sm btn-outline" onclick="setRange('last-week')">Last Week</button>
+            <button class="btn btn-sm btn-outline" onclick="setRange('last-7')">Last 7 Days</button>
+            <button class="btn btn-sm btn-outline" onclick="setRange('this-month')">This Month</button>
+            <button class="btn btn-sm btn-outline" onclick="setRange('last-month')">Last Month</button>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="stats-grid" style="margin-bottom:24px;">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value" th:text="'$' + ${totalRevenue}">$0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👤</div>
+                <div class="stat-label">Customers Served</div>
+                <div class="stat-value" th:text="${totalCustomers}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🧾</div>
+                <div class="stat-label">Avg. per Customer</div>
+                <div class="stat-value"
+                     th:text="${totalCustomers > 0 ? '$' + #numbers.formatDecimal(totalRevenue / totalCustomers, 1, 2) : '$0'}">$0</div>
+            </div>
+        </div>
+
+        <!-- Employee Performance — payroll-focused table -->
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-header">👥 Employee Performance</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th style="text-align:center;">Customers</th>
+                            <th style="text-align:right;">Revenue</th>
+                            <th style="text-align:right;">Avg / Customer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${employeePerformance.empty}">
+                            <td colspan="4" style="text-align:center; color:var(--text-muted); padding:24px;">No data for this period.</td>
+                        </tr>
+                        <tr th:each="row : ${employeePerformance}">
+                            <td>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:36px; height:36px; border-radius:50%; background:var(--primary-lt);
+                                                color:var(--primary); display:flex; align-items:center;
+                                                justify-content:center; font-weight:700; font-size:.85rem; flex-shrink:0;">
+                                        <span th:text="${row[0].toString().substring(0,1)}">J</span>
+                                    </div>
+                                    <span class="fw-bold" th:text="${row[0]}">Employee</span>
+                                </div>
+                            </td>
+                            <td style="text-align:center;">
+                                <span class="badge badge-primary" th:text="${row[1]}">0</span>
+                            </td>
+                            <td style="text-align:right;" class="fw-bold text-primary"
+                                th:text="'$' + ${#numbers.formatDecimal(row[2], 1, 2)}">$0</td>
+                            <td style="text-align:right;" class="text-muted"
+                                th:text="${row[1] != null and row[1] > 0 ? '$' + #numbers.formatDecimal(row[2] / row[1], 1, 2) : '$0'}">$0</td>
+                        </tr>
+                    </tbody>
+                    <tfoot th:if="${!employeePerformance.empty}">
+                        <tr style="border-top:2px solid var(--border); font-weight:700;">
+                            <td>Total</td>
+                            <td style="text-align:center;" th:text="${totalCustomers}">0</td>
+                            <td style="text-align:right;" class="text-primary"
+                                th:text="'$' + ${#numbers.formatDecimal(totalRevenue, 1, 2)}">$0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Top Services -->
+            <div class="card">
+                <div class="card-header">🏆 Top Services</div>
+                <div class="card-body">
+                    <div th:if="${topServices.empty}" style="color:var(--text-muted); text-align:center;">No data.</div>
+                    <div th:each="item, stat : ${topServices}"
+                         style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="background:var(--accent); color:#fff; border-radius:50%; width:26px; height:26px;
+                                         display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700;"
+                                  th:text="${stat.index + 1}">1</span>
+                            <span th:text="${item[0]}">Service</span>
+                        </div>
+                        <span class="badge badge-primary" th:text="${item[1]} + ' sales'">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Per-employee breakdown by day count -->
+            <div class="card">
+                <div class="card-header">📊 Range Summary</div>
+                <div class="card-body">
+                    <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+                        <span style="color:var(--text-muted);">Period</span>
+                        <span class="fw-bold"
+                              th:text="${#temporals.format(fromDate, 'MMM d')} + ' – ' + ${#temporals.format(toDate, 'MMM d, yyyy')}">—</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+                        <span style="color:var(--text-muted);">Total Days</span>
+                        <span class="fw-bold" th:text="${dayCount} + ' days'">—</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+                        <span style="color:var(--text-muted);">Total Transactions</span>
+                        <span class="fw-bold" th:text="${transactions.size()}">0</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:10px 0;">
+                        <span style="color:var(--text-muted);">Active Employees</span>
+                        <span class="fw-bold" th:text="${employeePerformance.size()}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="card mt-3">
+            <div class="card-header">🧾 Transactions</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date &amp; Time</th>
+                            <th>Employee</th>
+                            <th>Services</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${transactions.empty}">
+                            <td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">No transactions in this period.</td>
+                        </tr>
+                        <tr th:each="tx, stat : ${transactions}">
+                            <td class="text-muted" th:text="${stat.index + 1}">1</td>
+                            <td th:text="${#temporals.format(tx.createdAt, 'MMM d, HH:mm')}">Date</td>
+                            <td th:text="${tx.employee.name}">Name</td>
+                            <td>
+                                <span th:each="item, i : ${tx.items}">
+                                    <span th:text="${item.serviceName}">s</span><span th:if="${!i.last}">, </span>
+                                </span>
+                            </td>
+                            <td class="fw-bold text-primary" th:text="'$' + ${tx.totalAmount}">$0</td>
+                            <td><span class="badge badge-success" th:text="${tx.status}">COMPLETED</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setRange(preset) {
+        const today = new Date();
+        let from, to;
+
+        const fmt = d => d.toISOString().split('T')[0];
+        const monday = d => { const c = new Date(d); c.setDate(c.getDate() - ((c.getDay() + 6) % 7)); return c; };
+
+        switch (preset) {
+            case 'this-week':
+                from = monday(today);
+                to = today;
+                break;
+            case 'last-week':
+                from = monday(today);
+                from.setDate(from.getDate() - 7);
+                to = new Date(from);
+                to.setDate(to.getDate() + 6);
+                break;
+            case 'last-7':
+                from = new Date(today);
+                from.setDate(from.getDate() - 6);
+                to = today;
+                break;
+            case 'this-month':
+                from = new Date(today.getFullYear(), today.getMonth(), 1);
+                to = today;
+                break;
+            case 'last-month':
+                from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                to = new Date(today.getFullYear(), today.getMonth(), 0);
+                break;
+        }
+
+        document.getElementById('fromInput').value = fmt(from);
+        document.getElementById('toInput').value = fmt(to);
+        document.getElementById('rangeForm').submit();
+    }
+</script>
+</body>
+</html>

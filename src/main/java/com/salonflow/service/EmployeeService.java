@@ -21,7 +21,10 @@ public class EmployeeService {
     }
 
     public List<Employee> getEmployeesBySalon(Salon salon) {
-        return employeeRepository.findBySalonOrderByNameAsc(salon);
+        return employeeRepository.findBySalonOrderByNameAsc(salon)
+                .stream()
+                .filter(e -> !e.getStatus().equals(Employee.Status.DELETED))
+                .toList();
     }
 
     public List<Employee> getActiveEmployees(Salon salon) {

@@ -12,9 +12,11 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findBySalonAndCreatedAtBetweenOrderByCreatedAtDesc(
-            Salon salon, LocalDateTime start, LocalDateTime end);
+    // Used for reports & dashboard — excludes CANCELLED
+    List<Transaction> findBySalonAndStatusNotAndCreatedAtBetweenOrderByCreatedAtDesc(
+            Salon salon, Transaction.Status status, LocalDateTime start, LocalDateTime end);
 
+    // Used for the all-transactions list — includes CANCELLED
     List<Transaction> findBySalonOrderByCreatedAtDesc(Salon salon);
 
     @Query("SELECT COALESCE(SUM(t.totalAmount), 0) FROM Transaction t WHERE t.salon = :salon AND t.createdAt BETWEEN :start AND :end AND t.status = 'COMPLETED'")
@@ -33,9 +35,18 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                     @Param("end") LocalDateTime end);
 
     @Query("SELECT ti.serviceName, COUNT(ti) as cnt FROM TransactionItem ti " +
-           "JOIN ti.transaction t WHERE t.salon = :salon AND t.createdAt BETWEEN :start AND :end " +
-           "GROUP BY ti.serviceName ORDER BY cnt DESC")
+            "JOIN ti.transaction t WHERE t.salon = :salon AND t.createdAt BETWEEN :start AND :end " +
+            "AND t.status = 'COMPLETED' " +
+            "GROUP BY ti.serviceName ORDER BY cnt DESC")
     List<Object[]> findTopServicesByDateRange(@Param("salon") Salon salon,
                                               @Param("start") LocalDateTime start,
                                               @Param("end") LocalDateTime end);
+
+    @Query("SELECT t.employee.name, COUNT(t), COALESCE(SUM(t.totalAmount), 0) " +
+           "FROM Transaction t WHERE t.salon = :salon AND t.createdAt BETWEEN :start AND :end " +
+           "AND t.status = 'COMPLETED' " +
+           "GROUP BY t.employee.id, t.employee.name ORDER BY SUM(t.totalAmount) DESC")
+    List<Object[]> findEmployeePerformanceByDateRange(@Param("salon") Salon salon,
+                                                      @Param("start") LocalDateTime start,
+                                                      @Param("end") LocalDateTime end);
 }
