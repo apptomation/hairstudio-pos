@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Register Your Salon – SalonFlow</title>
+    <title>Register Your Business – CashFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
@@ -17,9 +17,9 @@
 <div class="auth-page">
     <div class="auth-box">
         <div class="auth-logo">
-            <div class="auth-logo-icon">✂️</div>
-            <div class="auth-logo-title">SalonFlow</div>
-            <div class="auth-logo-sub">Create your salon account</div>
+            <div class="auth-logo-icon"></div>
+            <div class="auth-logo-title">CashFlow</div>
+            <div class="auth-logo-sub">Create your business account</div>
         </div>
 
         <div th:if="${emailError}" class="alert alert-danger" th:text="${emailError}"></div>
@@ -33,7 +33,7 @@
             <div class="form-group">
                 <label class="form-label">Full Name *</label>
                 <input type="text" class="form-control" th:field="*{fullName}"
-                       placeholder="e.g. Jana Beauty Studio" required/>
+                       placeholder="e.g. Company Name" required/>
                 <span class="text-danger" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
             </div>
 
@@ -41,7 +41,7 @@
                 <div class="form-group">
                     <label class="form-label">Email Address *</label>
                     <input type="email" class="form-control" th:field="*{email}"
-                           placeholder="owner@salon.com" required/>
+                           placeholder="owner@domain.com" required/>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Phone Number *</label>
@@ -78,7 +78,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-full btn-lg mt-2">
-                🚀 Create Salon Account
+                🚀 Create Business Account
             </button>
         </form>
 

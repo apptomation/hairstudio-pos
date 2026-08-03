@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Owner Login – SalonFlow</title>
+    <title>Owner Login – CashFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
@@ -12,17 +12,17 @@
 <div class="auth-page">
     <div class="auth-box">
         <div class="auth-logo">
-            <div class="auth-logo-icon">✂️</div>
-            <div class="auth-logo-title">SalonFlow</div>
+            <div class="auth-logo-icon"></div>
+            <div class="auth-logo-title">Cash Flow</div>
             <div class="auth-logo-sub">Owner Portal</div>
         </div>
 
         <div th:if="${loginError}" class="alert alert-danger" th:text="${loginError}"></div>
         <div th:if="${logoutMessage}" class="alert alert-info" th:text="${logoutMessage}"></div>
         <div th:if="${successMessage}" class="alert alert-success">
-            <strong>🎉 Welcome to SalonFlow!</strong><br/>
+            <strong>🎉 Welcome to Cash Flow!</strong><br/>
             <span th:text="${successMessage}"></span><br/>
-            <strong>Save your Salon Code — employees will need it to log in.</strong>
+            <strong>Save your Code — employees will need it to log in.</strong>
         </div>
 
         <form th:action="@{/login}" method="post">
@@ -31,7 +31,7 @@
             <div class="form-group">
                 <label class="form-label">Email Address</label>
                 <input type="text" name="username" class="form-control"
-                       placeholder="owner@salon.com or admin" required autofocus/>
+                       placeholder="owner@domain.com" required autofocus/>
             </div>
             <div class="form-group">
                 <label class="form-label">Password</label>
@@ -46,13 +46,13 @@
 
 
         <p style="text-align:center; margin-top:20px; font-size:.88rem; color:var(--text-muted);">
-            New salon? <a th:href="@{/register}" style="color:var(--primary); font-weight:600;">Register here</a>
+            New business? <a th:href="@{/register}" style="color:var(--primary); font-weight:600;">Register here</a>
         </p>
     </div>
 </div>
 
 <footer class="auth-footer">
-    <p>© 2026 <a href="https://apptomation.ca" target="_blank" rel="noopener noreferrer" class="auth-footer-link">apptomation.ca</a> All rights reserved.</p>
+    <p>© 2026 <a href="https://proceedsystems.com/" target="_blank" rel="noopener noreferrer" class="auth-footer-link">proceedsystems.com</a> All rights reserved.</p>
 </footer>
 
 <style>
