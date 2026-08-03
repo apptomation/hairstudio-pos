@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="${pageTitle != null ? pageTitle + ' – SalonFlow' : 'SalonFlow'}">SalonFlow</title>
+    <title th:text="${pageTitle != null ? pageTitle + ' – CashFlow' : 'CashFlow'}">CashFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
@@ -14,8 +14,8 @@
 <!-- Owner Sidebar Navigation -->
 <div th:fragment="ownerNav" class="sidebar">
     <div class="sidebar-brand">
-        <div class="brand-icon">✂️</div>
-        <span>SalonFlow</span>
+        <div class="brand-icon">💸</div>
+        <span>Cash Flow</span>
     </div>
     <nav class="sidebar-nav">
         <a th:href="@{/owner/dashboard}" class="nav-item" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">

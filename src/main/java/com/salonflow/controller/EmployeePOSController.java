@@ -27,7 +27,7 @@ public class EmployeePOSController {
      * Reads salon code from URL, validates it, stores in session, redirects to PIN page.
      */
     @GetMapping
-    public String posEntry(@RequestParam(required = false) String salon,
+    public String posEntry(@RequestParam(required = false) String business,
                            HttpSession session,
                            Model model) {
         // If already logged in as employee, go straight to POS screen
@@ -35,14 +35,14 @@ public class EmployeePOSController {
             return "redirect:/pos/screen";
         }
 
-        if (salon == null || salon.isBlank()) {
+        if (business == null || business.isBlank()) {
             model.addAttribute("error", "No salon code provided in URL.");
             return "employee/salon-error";
         }
 
-        Optional<Salon> found = salonService.findBySalonCode(salon.toUpperCase().trim());
+        Optional<Salon> found = salonService.findBySalonCode(business.toUpperCase().trim());
         if (found.isEmpty()) {
-            model.addAttribute("error", "Salon code '" + salon + "' not found.");
+            model.addAttribute("error", "Salon code '" + business + "' not found.");
             return "employee/salon-error";
         }
 
@@ -127,7 +127,7 @@ public class EmployeePOSController {
         String code = salon != null ? salon.getSalonCode() : "";
         session.removeAttribute("posEmployee");
         session.removeAttribute("posSalon");
-        return "redirect:/pos?salon=" + code;
+        return "redirect:/pos?business=" + code;
     }
 
     // Keep old /pos/salon route working (for backward compat)

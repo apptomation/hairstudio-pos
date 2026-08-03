@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Employee PIN – SalonFlow POS</title>
+    <title>Employee PIN – CashFlow POS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
@@ -11,8 +11,8 @@
 <body>
 <div class="pin-page">
     <div class="pin-box">
-        <div style="font-size:2rem; margin-bottom:4px;">✂️</div>
-        <h2 style="font-size:1.1rem; font-weight:700;" th:text="${salonName}">Salon Name</h2>
+        <div style="font-size:2rem; margin-bottom:4px;">💸</div>
+        <h2 style="font-size:1.1rem; font-weight:700;" th:text="${salonName}">Business Name</h2>
         <p style="font-size:.8rem; color:var(--text-muted); margin-top:4px;">
             Code: <strong th:text="${salonCode}">BEAUTY001</strong>
         </p>
@@ -44,7 +44,7 @@
         </div>
 
         <p style="margin-top:20px; font-size:.8rem;">
-            <a th:href="@{/pos/salon}" style="color:var(--text-muted);">← Change Salon Code</a>
+            <a th:href="@{/pos/salon}" style="color:var(--text-muted);">← Change Business Code</a>
         </p>
     </div>
 </div>
